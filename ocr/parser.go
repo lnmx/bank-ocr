@@ -4,6 +4,8 @@ import (
 	"fmt"
 )
 
+var ErrIllegible = fmt.Errorf("one or more illegible digits")
+
 type Parser struct {
 	// number of digits
 	account_length int
@@ -16,11 +18,11 @@ type Parser struct {
 	digits []string
 }
 
-func NewParser() Parser {
+func NewParser(account_length int) Parser {
 	p := Parser{
 		digit_width:    3,
 		digit_height:   4,
-		account_length: 9,
+		account_length: account_length,
 	}
 
 	digits := []string{
@@ -46,22 +48,27 @@ func (p Parser) Parse(entry Entry) (acct Account, err error) {
 
 	output := make([]byte, p.account_length)
 	for i := 0; i < p.account_length; i++ {
-		output[i] = p.parseChar(entry, i)
+		if ok, d := p.parseChar(entry, i); ok {
+			output[i] = d
+		} else {
+			output[i] = '?'
+			err = ErrIllegible
+		}
 	}
 
-	return Account(output), nil
+	return Account(output), err
 }
 
-func (p Parser) parseChar(entry Entry, n int) byte {
+func (p Parser) parseChar(entry Entry, n int) (ok bool, d byte) {
 	char := p.extractChar(entry.Lines, n)
 
 	for i, digit := range p.digits {
 		if char == digit {
-			return byte('0' + i)
+			return true, byte('0' + i)
 		}
 	}
 
-	return '?'
+	return false, '?'
 }
 
 func (p Parser) extractChar(lines []string, n int) (char string) {
