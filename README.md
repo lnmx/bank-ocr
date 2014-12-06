@@ -16,6 +16,8 @@ or
 
 Install Go 1.3 from https://golang.org/dl/ and http://dl.golang.org/doc/install
 
+Then build from source:
+
     # create an empty workspace directory
     mkdir example
 
