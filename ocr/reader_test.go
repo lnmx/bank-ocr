@@ -15,10 +15,6 @@ func TestReaderOk(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if entry == nil {
-		t.Fatal("no entry returned")
-	}
-
 	if len(entry.Lines) != 4 {
 		t.Fatal("expected 4 lines in parsed entry")
 	}
@@ -31,11 +27,7 @@ func TestReaderOk(t *testing.T) {
 func TestReaderEOF(t *testing.T) {
 	reader := NewEntryReader(4, strings.NewReader("1\n2\n3"))
 
-	entry, err := reader.Next()
-
-	if entry != nil {
-		t.Fatal("expected nil entry from short input")
-	}
+	_, err := reader.Next()
 
 	if err != io.ErrUnexpectedEOF {
 		t.Fatal("expected", io.ErrUnexpectedEOF, "got", err)
